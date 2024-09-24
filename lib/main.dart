@@ -6,6 +6,9 @@ import 'screens/screen1.dart';
 import 'screens/LocationScreen.dart';
 import 'screens/screen2.dart';
 import 'screens/products.dart';
+import 'screens/OrderSummaryScreen.dart';
+import 'screens/PaymentPage.dart';
+
 void main() {
   runApp(MaterialApp(
     initialRoute: 'home_screen',
@@ -18,6 +21,8 @@ void main() {
       'screen2': (context) => screen2(),
       'LocationScreen': (context) => LocationScreen(),
       'products': (context) =>  ProductListScreen(),
+      'OrderSummaryScreen': (context) => OrderSummaryScreen(cartItems: [], onAddItems: () {  },),
+      'PaymentPage' : (context) => PaymentPage(),
     },
     theme: ThemeData(
       primarySwatch: Colors.green,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'OrderSummaryScreen.dart';
+
 
 class ProductListScreen extends StatefulWidget {
   @override
@@ -90,34 +92,51 @@ class _ProductListScreenState extends State<ProductListScreen> {
       // Show Add to Cart button if items are in the cart
       bottomNavigationBar: totalItemsInCart > 0
           ? BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: ElevatedButton(
-            onPressed: () {
-              // Handle Add to Cart functionality
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                  'Added $totalItemsInCart items to the cart!',
-                  style: TextStyle(color: Colors.white), // Set the text color to white
-                ),
 
-              ));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+        child: Padding(
+
+          padding: const EdgeInsets.all(10.0),
+           child:  ElevatedButton(
+              onPressed: () {
+                // Navigate to the OrderSummaryScreen with cart items
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OrderSummaryScreen(
+                      cartItems: products.where((item) => item['quantity'] > 0).toList(), // Only pass items with quantity > 0
+                      onAddItems: () {
+                        Navigator.pop(context); // Navigate back to add more items
+                      },
+                    ),
+                  ),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(
+                    'Added $totalItemsInCart items to the cart!',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,// Keeping the green background
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                //padding: EdgeInsets.all(15),
+                minimumSize: Size(double.infinity, 50), // Full width
               ),
-              padding: EdgeInsets.all(15),
-            ),
-            child: Text(
-              'Add $totalItemsInCart items to cart',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white, // Ensure white foreground color for visibility
+              child: Text(
+                'ADD TO CART',
+                style: TextStyle(
+
+                  fontSize: 18, // Adjust font size as needed
+                             // To make the text stand out more
+                  color: Colors.white, // Change to white for better visibility
+                ),
               ),
-            ),
-          ),
+            )
+
+
         ),
       )
           : SizedBox.shrink(), // If no items are selected, hide the button

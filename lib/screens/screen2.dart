@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'OrderSummaryScreen.dart';
 
 class screen2 extends StatefulWidget {
   const screen2({super.key});
@@ -28,7 +29,7 @@ class _screen2State extends State<screen2> {
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
-            // Action for leading icon
+            Scaffold.of(context).openDrawer(); // Opens the drawer (slider)
           },
         ),
         actions: [
@@ -45,20 +46,77 @@ class _screen2State extends State<screen2> {
             },
           ),
         ],
-        iconTheme: IconThemeData(
-          color: Colors.white, // Icon color
-          size: 24.0, // Icon size
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.white, // Title text color
-          fontSize: 20, // Title font size
-          fontWeight: FontWeight.bold, // Title font weight
-        ),
-        shadowColor: Colors.grey, // Shadow color
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(5), // Rounded bottom corners
-          ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.green.shade600,
+              ),
+              child: const Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('Vishal Stores'),
+              leading: Icon(Icons.circle, size: 10),
+              onTap: () {
+                // Handle shop selection
+                Navigator.pop(context); // Close the drawer after selection
+              },
+            ),
+            ListTile(
+              title: Text('Shop 2'),
+              leading: Icon(Icons.circle, size: 10),
+              onTap: () {
+                // Handle shop selection
+                Navigator.pop(context); // Close the drawer after selection
+              },
+            ),
+            ListTile(
+              title: Text('Shop 3'),
+              leading: Icon(Icons.circle, size: 10),
+              onTap: () {
+                // Handle shop selection
+                Navigator.pop(context); // Close the drawer after selection
+              },
+            ),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text('Other Services', style: TextStyle(fontSize: 16, color: Colors.black)),
+            ),
+            ListTile(
+              title: Text('Plumber'),
+              leading: Icon(Icons.build, size: 20),
+              onTap: () {
+                // Handle plumber selection
+                Navigator.pop(context); // Close the drawer after selection
+              },
+            ),
+            ListTile(
+              title: Text('Carpenter'),
+              leading: Icon(Icons.home_repair_service, size: 20),
+              onTap: () {
+                // Handle carpenter selection
+                Navigator.pop(context); // Close the drawer after selection
+              },
+            ),
+            ListTile(
+              title: Text('Painter'),
+              leading: Icon(Icons.format_paint, size: 20),
+              onTap: () {
+                // Handle painter selection
+                Navigator.pop(context); // Close the drawer after selection
+              },
+            ),
+          ],
         ),
       ),
       body: ListView.builder(
@@ -80,7 +138,7 @@ class _screen2State extends State<screen2> {
               IconButton(
                 icon: Icon(Icons.shopping_cart),
                 onPressed: () {
-                  // Add action here
+                  Navigator.pushNamed(context, 'OrderSummaryScreen'); // Add action here
                 },
               ),
               IconButton(
