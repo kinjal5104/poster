@@ -17,13 +17,15 @@ class OrderSummaryScreen extends StatefulWidget {
 class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   // Method to calculate the total price
   double calculateTotalPrice() {
-    return widget.cartItems.fold(0, (sum, item) => sum + (item['price'] * item['quantity']));
+    return widget.cartItems.fold(0.0, (sum, item) {
+      return sum + (item['price'].toDouble() * item['quantity'].toDouble());
+    });
   }
 
   // Method to handle increment
   void incrementQuantity(int index) {
     setState(() {
-      if (widget.cartItems[index]['quantity'] < 10) { // Maximum quantity of 10
+      if (widget.cartItems[index]['quantity'] < 10) {
         widget.cartItems[index]['quantity']++;
       }
     });
@@ -32,7 +34,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   // Method to handle decrement
   void decrementQuantity(int index) {
     setState(() {
-      if (widget.cartItems[index]['quantity'] > 1) { // Minimum quantity of 1
+      if (widget.cartItems[index]['quantity'] > 1) {
         widget.cartItems[index]['quantity']--;
       }
     });
@@ -65,8 +67,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 final item = widget.cartItems[index];
                 return OrderSummaryCard(
                   name: item['name'],
-                  price: item['price'],
-                  quantity: item['quantity'],
+                  price: item['price'].toDouble(), // Ensure price is double
+                  quantity: item['quantity'], // Keep quantity as int
                   image: item['image'],
                   onIncrement: () => incrementQuantity(index),
                   onDecrement: () => decrementQuantity(index),
@@ -75,7 +77,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               },
             ),
           ),
-          // Place the Add Items button and total summary below the list
           Padding(
             padding: const EdgeInsets.all(15.0),
             child: Row(
@@ -96,7 +97,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, 'PaymentPage'); // Proceed with order summary (e.g., checkout)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PaymentPage(
+                          cartItems: widget.cartItems,
+                          totalPrice: calculateTotalPrice(),
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade600,
@@ -114,41 +123,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.shopping_cart),
-                onPressed: () {
-                  Navigator.pushNamed(context, 'OrderSummaryScreen'); // Add action here
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () {
-                  // Add action here
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.person),
-                onPressed: () {
-                  // Add action here
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
 
 class OrderSummaryCard extends StatelessWidget {
   final String name;
-  final int price;
+  final double price; // Ensure price is double
   final int quantity;
   final String image;
   final VoidCallback onIncrement;
@@ -186,7 +167,7 @@ class OrderSummaryCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text('₹ $price', style: TextStyle(fontSize: 16)),
+                  Text('₹ ${price.toStringAsFixed(2)}', style: TextStyle(fontSize: 16)),
                   Text('Quantity: $quantity', style: TextStyle(fontSize: 14)),
                 ],
               ),
