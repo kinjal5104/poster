@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
-import 'screens//phone.dart';
+import 'screens/phone.dart';
 import 'screens/otp.dart';
 import 'screens/screen1.dart';
 import 'screens/LocationScreen.dart';
@@ -20,9 +20,11 @@ void main() {
       'screen1': (context) => Screen1(),
       'screen2': (context) => screen2(),
       'LocationScreen': (context) => LocationScreen(),
-      'products': (context) =>  ProductListScreen(),
-      'OrderSummaryScreen': (context) => OrderSummaryScreen(cartItems: [], onAddItems: () {  },),
-      'PaymentPage' : (context) => PaymentPage(),
+      'products': (context) => ProductListScreen(),
+      'OrderSummaryScreen': (context) => OrderSummaryScreen(
+        cartItems: [], // Initialize an empty cart
+        onAddItems: () {},
+      ),
     },
     theme: ThemeData(
       primarySwatch: Colors.green,
