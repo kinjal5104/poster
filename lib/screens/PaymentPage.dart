@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: PaymentPage(),
-    );
-  }
-}
-
 class PaymentPage extends StatefulWidget {
+  final List<Map<String, dynamic>> cartItems;
+  final double totalPrice;
+
+  PaymentPage({
+    required this.cartItems,
+    required this.totalPrice,
+  });
+
   @override
   _PaymentPageState createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  final double totalPrice = 570.0; // Total price as shown in the image
-  String selectedPaymentMethod = "Payment on Delivery";
+  String _selectedPaymentMethod = "Payment via UPI"; // Default selected payment method
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +36,18 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
             ),
             SizedBox(height: 8),
-            OrderItem(description: '2 x Amul Cheese - 250g', price: 340),
-            OrderItem(description: '1 x Tata Salt - 100g', price: 100),
-            OrderItem(description: '1 x Lizol Cleaner - 150g', price: 140),
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.cartItems.length,
+                itemBuilder: (context, index) {
+                  final item = widget.cartItems[index];
+                  return OrderItem(
+                    description: '${item['quantity']} x ${item['name']}',
+                    price: (item['price'] is int ? (item['price'] as int).toDouble() : item['price']) * item['quantity'].toDouble(),
+                  );
+                },
+              ),
+            ),
             Divider(),
             // Total Price
             Row(
@@ -58,7 +61,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   ),
                 ),
                 Text(
-                  '₹ ${totalPrice.toStringAsFixed(0)}',
+                  '₹ ${widget.totalPrice.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,
@@ -79,48 +82,48 @@ class _PaymentPageState extends State<PaymentPage> {
             ListTile(
               leading: Radio<String>(
                 value: "Payment on Delivery",
-                groupValue: selectedPaymentMethod,
-                onChanged: (String? value) {
+                groupValue: _selectedPaymentMethod,
+                onChanged: (value) {
                   setState(() {
-                    selectedPaymentMethod = value!;
+                    _selectedPaymentMethod = value!;
                   });
                 },
               ),
-              title: Text('Payment on Delivery'),
+              title: Text("Payment on Delivery"),
             ),
             ListTile(
               leading: Radio<String>(
-                value: "Pay via UPI",
-                groupValue: selectedPaymentMethod,
-                onChanged: (String? value) {
+                value: "Payment via UPI",
+                groupValue: _selectedPaymentMethod,
+                onChanged: (value) {
                   setState(() {
-                    selectedPaymentMethod = value!;
+                    _selectedPaymentMethod = value!;
                   });
                 },
               ),
-              title: Text('Pay via UPI'),
+              title: Text("Payment via UPI"),
             ),
-            SizedBox(height: 20),
-            // Confirm Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle payment confirmation
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Payment method: $selectedPaymentMethod, Total: ₹${totalPrice.toStringAsFixed(0)}'),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding:
-                  EdgeInsets.symmetric(horizontal: 40.0, vertical: 15.0),
-                  textStyle: TextStyle(fontSize: 16.0),
-                ),
-                child: Text('Click to confirm'),
+            ElevatedButton(
+              onPressed: () {
+                // Payment Logic
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Payment Successful'),
+                    content: Text('Thank you for your purchase!'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green.shade600,
               ),
+              child: Text('Proceed to Pay'),
             ),
           ],
         ),
@@ -129,12 +132,14 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 }
 
-// Order Item Widget to reuse
 class OrderItem extends StatelessWidget {
   final String description;
   final double price;
 
-  OrderItem({required this.description, required this.price});
+  const OrderItem({
+    required this.description,
+    required this.price,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +149,7 @@ class OrderItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(description),
-          Text('₹ ${price.toStringAsFixed(0)}'),
+          Text('₹ ${price.toStringAsFixed(2)}'),
         ],
       ),
     );
