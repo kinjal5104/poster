@@ -12,10 +12,8 @@ class _screen2State extends State<screen2> {
   // List of shops with different names, locations, and ratings
   final List<Map<String, String>> shops = [
     {'name': 'Vishal Stores', 'location': 'Worli Mumbai', 'ratings': '204'},
-    {'name': 'Raghu Stores', 'location': 'Andheri Mumbai', 'ratings': '150'},
-    {'name': 'Milk', 'location': 'Bandra Mumbai', 'ratings': '230'},
-    {'name': 'Saniya', 'location': 'Colaba Mumbai', 'ratings': '190'},
-    {'name': 'Anushka', 'location': 'US', 'ratings': '200'},
+    {'name': 'Abdul Grocery Shop', 'location': 'Prabhadevi Mumbai', 'ratings': '150'},
+
   ];
 
   @override
@@ -72,7 +70,7 @@ class _screen2State extends State<screen2> {
               },
             ),
             ListTile(
-              title: Text('Shop 2'),
+              title: Text('Abdul Grocery Shop'),
               leading: Icon(Icons.circle, size: 10),
               onTap: () {
                 // Handle shop selection

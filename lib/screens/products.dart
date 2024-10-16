@@ -11,30 +11,72 @@ class _ProductListScreenState extends State<ProductListScreen> {
   // Sample product data
   final List<Map<String, dynamic>> products = [
     {
-      'name': 'Amul Cheese',
+      'name': 'Pringles',
+      'price': 35,
+      'image': 'Assests/pringles.jpg', // Replace with the correct image path
+      'quantity': 0,
+      'isSelected': false
+    },
+    {
+      'name': 'Cheese',
       'price': 135,
+      'image': 'Assests/cheese.jpg', // Replace with the correct image path
+      'quantity': 0,
+      'isSelected': false
+    },
+    {
+      'name': 'Mayonnaise',
+      'price': 100,
       'image': 'Assests/th.jpeg', // Replace with the correct image path
       'quantity': 0,
       'isSelected': false
     },
     {
-      'name': 'Paneer',
-      'price': 135,
-      'image': 'Assests/th.jpeg', // Replace with the correct image path
+      'name': 'Fruit cake',
+      'price': 35,
+      'image': 'Assests/fruitcake.jpg', // Replace with the correct image path
       'quantity': 0,
       'isSelected': false
     },
+
     {
-      'name': 'Dal',
-      'price': 135,
-      'image': 'Assests/th.jpeg', // Replace with the correct image path
+      'name': 'Samosa',
+      'price': 15,
+      'image': 'Assests/images.jpeg', // Replace with the correct image path
       'quantity': 0,
       'isSelected': false
     },
+
     {
-      'name': 'Spices',
-      'price': 135,
-      'image': 'Assests/th.jpeg', // Replace with the correct image path
+      'name': 'Dhokla',
+      'price': 50,
+      'image': 'Assests/dhokla.jpg', // Replace with the correct image path
+      'quantity': 0,
+      'isSelected': false
+    },
+
+    {
+      'name': 'Batata Wada',
+      'price': 35,
+      'image': 'Assests/batatawada.jpg', // Replace with the correct image path
+      'quantity': 0,
+      'isSelected': false
+    },
+
+
+
+    {
+      'name': 'Dairy Milk',
+      'price': 10,
+      'image': 'Assests/dairy.jpg', // Replace with the correct image path
+      'quantity': 0,
+      'isSelected': false
+    },
+
+    {
+      'name': '5 star',
+      'price': 10,
+      'image': 'Assests/5star.jpg', // Replace with the correct image path
       'quantity': 0,
       'isSelected': false
     },
