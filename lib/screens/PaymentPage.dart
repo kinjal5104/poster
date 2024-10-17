@@ -123,7 +123,10 @@ class _PaymentPageState extends State<PaymentPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade600,
               ),
-              child: Text('Proceed to Pay'),
+              child: Text(
+                  'Proceed to Pay',
+                style: TextStyle(color: Colors.white)
+              ),
             ),
           ],
         ),

@@ -231,7 +231,10 @@ class ShopCard extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, 'products');
                 },
-                child: Text('Products'),
+                child: Text(
+                    'Products',
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                 ),
