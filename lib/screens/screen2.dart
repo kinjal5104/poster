@@ -13,8 +13,7 @@ class _Screen2State extends State<Screen2> {
   final List<Map<String, dynamic>> shops = [
     {'name': 'Vishal Stores', 'location': 'Worli, Mumbai', 'lat': 19.0176, 'lon': 72.8562, 'ratings': '204'},
     {'name': 'Abdul Grocery Shop', 'location': 'Prabhadevi, Mumbai', 'lat': 19.0167, 'lon': 72.8300, 'ratings': '150'},
-    {'name': 'Swami Samarth Kirana Stores', 'location': 'Ulhasnagar, Kalyan', 'lat': 37.42, 'lon': -122.084, 'ratings': '160'},
-    {'name': 'Shreeram Stores', 'location': 'Thane', 'lat': 19.2183, 'lon': 72.9781, 'ratings': '150'},
+    {'name': 'Shreeram Stores', 'location': 'Thane', 'lat': 19.1868, 'lon': 72.9772, 'ratings': '150'},
     {'name': 'Dmart', 'location': 'Lower Parel, Mumbai', 'lat': 19.0033, 'lon': 72.8296, 'ratings': '320'},
     {'name': 'Big Bazaar', 'location': 'Vashi, Navi Mumbai', 'lat': 19.0771, 'lon': 72.9986, 'ratings': '260'},
     {'name': 'More Supermarket', 'location': 'Ghatkopar, Mumbai', 'lat': 19.0856, 'lon': 72.9081, 'ratings': '310'},
@@ -38,26 +37,82 @@ class _Screen2State extends State<Screen2> {
     }
   }
 
-  void _filterShopsByCurrentLocation(Position position) {
-    setState(() {
-      filteredShops = shops.where((shop) {
-        double distanceInMeters = Geolocator.distanceBetween(
-          position.latitude,
-          position.longitude,
-          shop['lat'],
-          shop['lon'],
+  Future<void> _useCurrentLocation(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location services are disabled. Please enable them.')),
+      );
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Location permissions are denied')),
         );
-        return distanceInMeters <= 10000; // 10 km radius
-      }).toList();
-      isLoading = false;
-    });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location permissions are permanently denied. Enable permissions in settings.')),
+      );
+      return;
+    }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      if (position != null) {
+        Navigator.pushNamed(context, 'screen2', arguments: position);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to get location. Please try again.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to get location. Please try again.')),
+      );
+    }
   }
 
   void _filterShopsByManualEntry(String locationFilter) {
     setState(() {
       filteredShops = shops.where((shop) {
         return shop['location'].toLowerCase().contains(locationFilter.toLowerCase());
+      }).map((shop) {
+        shop['distance'] = shop['distance'] ?? 0; // Set a default value for distance
+        return shop;
       }).toList();
+      isLoading = false;
+    });
+  }
+
+  void _filterShopsByCurrentLocation(Position userPosition) {
+    setState(() {
+      filteredShops = shops
+          .map((shop) {
+        final double distance = Geolocator.distanceBetween(
+          userPosition.latitude,
+          userPosition.longitude,
+          shop['lat'],
+          shop['lon'],
+        );
+        shop['distance'] = distance;
+        return shop;
+      })
+          .toList()
+        ..sort((a, b) => a['distance'].compareTo(b['distance']));
       isLoading = false;
     });
   }
@@ -84,6 +139,9 @@ class _Screen2State extends State<Screen2> {
                 name: filteredShops[index]['name'],
                 location: filteredShops[index]['location'],
                 ratings: filteredShops[index]['ratings'],
+                distance: filteredShops[index]['distance'] != null
+                    ? filteredShops[index]['distance'].toStringAsFixed(2)
+                    : 'N/A', // Handle null distance
               );
             },
           ),
@@ -121,11 +179,13 @@ class ShopCard extends StatelessWidget {
   final String name;
   final String location;
   final String ratings;
+  final String distance;
 
   const ShopCard({
     required this.name,
     required this.location,
     required this.ratings,
+    required this.distance,
   });
 
   @override
@@ -158,6 +218,13 @@ class ShopCard extends StatelessWidget {
                     ),
                     Text(
                       'Location: $location',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    Text(
+                      'Distance: $distance meters',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[600],
