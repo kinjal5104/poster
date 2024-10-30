@@ -1,131 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'OrderSummaryScreen.dart';
 
-class screen2 extends StatefulWidget {
-  const screen2({super.key});
+class Screen2 extends StatefulWidget {
+  const Screen2({super.key});
 
   @override
-  State<screen2> createState() => _screen2State();
+  State<Screen2> createState() => _Screen2State();
 }
 
-class _screen2State extends State<screen2> {
-  // List of shops with different names, locations, and ratings
-  final List<Map<String, String>> shops = [
-    {'name': 'Vishal Stores', 'location': 'Worli Mumbai', 'ratings': '204'},
-    {'name': 'Abdul Grocery Shop', 'location': 'Prabhadevi Mumbai', 'ratings': '150'},
-
+class _Screen2State extends State<Screen2> {
+  final List<Map<String, dynamic>> shops = [
+    {'name': 'Vishal Stores', 'location': 'Worli, Mumbai', 'lat': 19.0176, 'lon': 72.8562, 'ratings': '204'},
+    {'name': 'Abdul Grocery Shop', 'location': 'Prabhadevi, Mumbai', 'lat': 19.0167, 'lon': 72.8300, 'ratings': '150'},
+    {'name': 'Swami Samarth Kirana Stores', 'location': 'Ulhasnagar, Kalyan', 'lat': 37.42, 'lon': -122.084, 'ratings': '160'},
+    {'name': 'Shreeram Stores', 'location': 'Thane', 'lat': 19.2183, 'lon': 72.9781, 'ratings': '150'},
+    {'name': 'Dmart', 'location': 'Lower Parel, Mumbai', 'lat': 19.0033, 'lon': 72.8296, 'ratings': '320'},
+    {'name': 'Big Bazaar', 'location': 'Vashi, Navi Mumbai', 'lat': 19.0771, 'lon': 72.9986, 'ratings': '260'},
+    {'name': 'More Supermarket', 'location': 'Ghatkopar, Mumbai', 'lat': 19.0856, 'lon': 72.9081, 'ratings': '310'},
+    {'name': 'Reliance Fresh', 'location': 'Mulund, Mumbai', 'lat': 19.1726, 'lon': 72.9597, 'ratings': '290'},
+    {'name': 'Apna Bazar', 'location': 'Chembur, Mumbai', 'lat': 19.0623, 'lon': 72.9270, 'ratings': '270'},
+    {'name': 'Star Bazaar', 'location': 'Andheri, Mumbai', 'lat': 19.1197, 'lon': 72.8479, 'ratings': '315'},
   ];
+
+  List<Map<String, dynamic>> filteredShops = [];
+  bool isLoading = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final arguments = ModalRoute.of(context)!.settings.arguments;
+
+    if (arguments is Position) {
+      _filterShopsByCurrentLocation(arguments);
+    } else if (arguments is String) {
+      _filterShopsByManualEntry(arguments);
+    }
+  }
+
+  void _filterShopsByCurrentLocation(Position position) {
+    setState(() {
+      filteredShops = shops.where((shop) {
+        double distanceInMeters = Geolocator.distanceBetween(
+          position.latitude,
+          position.longitude,
+          shop['lat'],
+          shop['lon'],
+        );
+        return distanceInMeters <= 10000; // 10 km radius
+      }).toList();
+      isLoading = false;
+    });
+  }
+
+  void _filterShopsByManualEntry(String locationFilter) {
+    setState(() {
+      filteredShops = shops.where((shop) {
+        return shop['location'].toLowerCase().contains(locationFilter.toLowerCase());
+      }).toList();
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Online Local Shopping'),
-        backgroundColor: Colors.green.shade600, // Green shade
-        centerTitle: true, // Center the title
-        elevation: 4.0, // Adds a subtle shadow
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            Scaffold.of(context).openDrawer(); // Opens the drawer (slider)
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Action for search button
+        backgroundColor: Colors.green.shade600,
+        centerTitle: true,
+        elevation: 4.0,
+      ),
+      body: Center(
+        child: isLoading
+            ? CircularProgressIndicator()
+            : filteredShops.isEmpty
+            ? Text('No shops found for the selected location.')
+            : Expanded(
+          child: ListView.builder(
+            itemCount: filteredShops.length,
+            itemBuilder: (context, index) {
+              return ShopCard(
+                name: filteredShops[index]['name'],
+                location: filteredShops[index]['location'],
+                ratings: filteredShops[index]['ratings'],
+              );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Action for shopping cart button
-            },
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.green.shade600,
-              ),
-              child: const Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text('Vishal Stores'),
-              leading: Icon(Icons.circle, size: 10),
-              onTap: () {
-                // Handle shop selection
-                Navigator.pop(context); // Close the drawer after selection
-              },
-            ),
-            ListTile(
-              title: Text('Abdul Grocery Shop'),
-              leading: Icon(Icons.circle, size: 10),
-              onTap: () {
-                // Handle shop selection
-                Navigator.pop(context); // Close the drawer after selection
-              },
-            ),
-            ListTile(
-              title: Text('Shop 3'),
-              leading: Icon(Icons.circle, size: 10),
-              onTap: () {
-                // Handle shop selection
-                Navigator.pop(context); // Close the drawer after selection
-              },
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text('Other Services', style: TextStyle(fontSize: 16, color: Colors.black)),
-            ),
-            ListTile(
-              title: Text('Plumber'),
-              leading: Icon(Icons.build, size: 20),
-              onTap: () {
-                // Handle plumber selection
-                Navigator.pop(context); // Close the drawer after selection
-              },
-            ),
-            ListTile(
-              title: Text('Carpenter'),
-              leading: Icon(Icons.home_repair_service, size: 20),
-              onTap: () {
-                // Handle carpenter selection
-                Navigator.pop(context); // Close the drawer after selection
-              },
-            ),
-            ListTile(
-              title: Text('Painter'),
-              leading: Icon(Icons.format_paint, size: 20),
-              onTap: () {
-                // Handle painter selection
-                Navigator.pop(context); // Close the drawer after selection
-              },
-            ),
-          ],
         ),
-      ),
-      body: ListView.builder(
-        itemCount: shops.length, // Number of shops
-        itemBuilder: (context, index) {
-          return ShopCard(
-            name: shops[index]['name']!,
-            location: shops[index]['location']!,
-            ratings: shops[index]['ratings']!,
-          );
-        },
       ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
@@ -136,20 +98,16 @@ class _screen2State extends State<screen2> {
               IconButton(
                 icon: Icon(Icons.shopping_cart),
                 onPressed: () {
-                  Navigator.pushNamed(context, 'OrderSummaryScreen'); // Add action here
+                  Navigator.pushNamed(context, 'OrderSummaryScreen');
                 },
               ),
               IconButton(
                 icon: Icon(Icons.home),
-                onPressed: () {
-                  // Add action here
-                },
+                onPressed: () {},
               ),
               IconButton(
                 icon: Icon(Icons.person),
-                onPressed: () {
-                  // Add action here
-                },
+                onPressed: () {},
               ),
             ],
           ),
@@ -182,7 +140,7 @@ class ShopCard extends StatelessWidget {
             Row(
               children: [
                 Image.asset(
-                  'Assests/store.jpeg', // Add your image in assets folder
+                  'Assests/store.jpeg',
                   height: 80,
                   width: 80,
                   fit: BoxFit.cover,
@@ -232,7 +190,7 @@ class ShopCard extends StatelessWidget {
                   Navigator.pushNamed(context, 'products');
                 },
                 child: Text(
-                    'Products',
+                  'Explore',
                   style: TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(

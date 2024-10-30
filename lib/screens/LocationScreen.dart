@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../widgets/image_slider.dart';
 
 class LocationScreen extends StatelessWidget {
@@ -7,47 +8,24 @@ class LocationScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Online Local Shopping'),
-        backgroundColor: Colors.green.shade600, // Green shade
-        centerTitle: true, // Center the title
-        elevation: 4.0, // Adds a subtle shadow
+        backgroundColor: Colors.green.shade600,
+        centerTitle: true,
+        elevation: 4.0,
         leading: IconButton(
           icon: const Icon(Icons.menu),
-          onPressed: () {
-            // Action for leading icon
-          },
+          onPressed: () {},
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {
-              // Action for search button
-            },
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              // Action for shopping cart button
-            },
+            onPressed: () {},
           ),
         ],
-        iconTheme: IconThemeData(
-          color: Colors.white, // Icon color
-          size: 24.0, // Icon size
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.white, // Title text color
-          fontSize: 20, // Title font size
-          fontWeight: FontWeight.bold, // Title font weight
-        ),
-        shadowColor: Colors.grey, // Shadow color
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(5), // Rounded bottom corners
-          ),
-        ),
       ),
-
-
       body: Center(
         child: Column(
           children: [
@@ -67,13 +45,13 @@ class LocationScreen extends StatelessWidget {
                   SizedBox(height: 40),
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Handle current location logic
                       _useCurrentLocation(context);
                     },
                     icon: Icon(Icons.location_on),
                     label: Text('Use Current Location'),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.green, // Button text color
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green,
                       padding: EdgeInsets.symmetric(vertical: 15),
                       textStyle: TextStyle(fontSize: 18),
                     ),
@@ -87,13 +65,18 @@ class LocationScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Handle manual location input logic
-                      _enterLocationManually(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManualLocationEntryScreen(),
+                        ),
+                      );
                     },
                     icon: Icon(Icons.edit_location_alt),
                     label: Text('Enter Location Manually'),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.green, // Button text color
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green,
                       padding: EdgeInsets.symmetric(vertical: 15),
                       textStyle: TextStyle(fontSize: 18),
                     ),
@@ -112,68 +95,71 @@ class LocationScreen extends StatelessWidget {
             children: <Widget>[
               IconButton(
                 icon: Icon(Icons.shopping_cart),
-                onPressed: () {
-                  // Add action here
-                },
+                onPressed: () {},
               ),
               IconButton(
                 icon: Icon(Icons.home),
-                onPressed: () {
-                  // Add action here
-                },
+                onPressed: () {},
               ),
               IconButton(
                 icon: Icon(Icons.person),
-                onPressed: () {
-                  // Add action here
-                },
+                onPressed: () {},
               ),
             ],
           ),
         ),
       ),
-
     );
   }
 
-  // Function to simulate using the current location
-  void _useCurrentLocation(BuildContext context) {
-    // You can integrate actual location logic here using geolocation packages.
-    // For now, this is a simple dialog for demonstration.
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Current Location'),
-          content: Text('Using your current location...'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, 'screen2');
-              },
-              child: Text('OK'),
-            ),
-          ],
+  Future<void> _useCurrentLocation(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location services are disabled. Please enable them.')),
+      );
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Location permissions are denied')),
         );
-      },
-    );
-  }
+        return;
+      }
+    }
 
-  // Function to simulate manual location entry
-  void _enterLocationManually(BuildContext context) {
-    // Show a dialog or navigate to another screen where the user can enter an address.
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ManualLocationEntryScreen(),
-      ),
-    );
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location permissions are permanently denied. Enable permissions in settings.')),
+      );
+      return;
+    }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      Navigator.pushNamed(context, 'screen2', arguments: position);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to get location. Please try again.')),
+      );
+    }
   }
 }
 
-// A simple screen for manual location input
 class ManualLocationEntryScreen extends StatelessWidget {
+  final TextEditingController locationController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,29 +169,46 @@ class ManualLocationEntryScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Enter your address',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: locationController,
+                decoration: InputDecoration(
+                  labelText: 'Enter your address',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: 'e.g., Worli, Mumbai',
                 ),
-                hintText: 'e.g., 1234 Main St',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a location';
+                  }
+                  return null;
+                },
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, 'screen2');
-              },
-              child: Text('Submit'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.green, // Button text color
-                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.pushNamed(
+                      context,
+                      'screen2',
+                      arguments: locationController.text.trim(),
+                    );
+                  }
+                },
+                child: Text('Submit'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

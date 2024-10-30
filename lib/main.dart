@@ -18,7 +18,7 @@ void main() {
       'otp': (context) => MyOtp(),
       'home_screen': (context) => HomeScreen(),
       'screen1': (context) => Screen1(),
-      'screen2': (context) => screen2(),
+      'screen2': (context) => Screen2(),
       'LocationScreen': (context) => LocationScreen(),
       'products': (context) => ProductListScreen(),
       'OrderSummaryScreen': (context) => OrderSummaryScreen(
