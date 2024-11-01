@@ -1,24 +1,24 @@
 import 'dart:async'; // Required for Timer
 import 'package:flutter/material.dart';
 
-class ImageSlider1 extends StatefulWidget {
+class ImageSlider extends StatefulWidget {
   @override
   _ImageSliderState createState() => _ImageSliderState();
 }
 
-class _ImageSliderState extends State<ImageSlider1> {
+class _ImageSliderState extends State<ImageSlider> {
   final List<Map<String, String>> imgList = [
     {
-      'image': 'Assests/slide1.png',
-
+      'image': 'Assests/image1.png',
+      'text': 'AB LOCAL HOGA VOCAL',
     },
     {
-      'image': 'Assests/slide2.png',
-
+      'image': 'Assests/image2.png',
+      'text': 'FROM STORE TO DOOR',
     },
     {
-      'image': 'Assests/slide3.png',
-
+      'image': 'Assests/image3.png',
+      'text': 'FAST DELIVERY, FRIENDLY SERVICE',
     },
   ];
 
@@ -64,11 +64,9 @@ class _ImageSliderState extends State<ImageSlider1> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         SizedBox(
-          width: double.infinity,
-          height: 225, // Customizable height for the slider
+          height: 300, // Customizable height for the slider
           child: PageView.builder(
             controller: _pageController,
             itemCount: imgList.length,
@@ -84,18 +82,49 @@ class _ImageSliderState extends State<ImageSlider1> {
                   Image.asset(
                     imgList[index]['image']!,
                     fit: BoxFit.contain,
-                    width: double.infinity,
-                    height: 225, // Set height for images
+                    height: 200, // Set height for images
                   ),
-
-
-
+                  const SizedBox(height: 10),
+                  // Text under each image
+                  Text(
+                    imgList[index]['text']!,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               );
             },
           ),
         ),
-
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: imgList.asMap().entries.map((entry) {
+            return GestureDetector(
+              onTap: () {
+                _pageController.animateToPage(
+                  entry.key,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              },
+              child: Container(
+                width: 8.0,
+                height: 8.0,
+                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (_currentPage == entry.key
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey).withOpacity(0.4),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ],
     );
   }
