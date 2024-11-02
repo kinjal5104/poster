@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'PhonePePayment.dart';
 
 class PaymentPage extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -105,27 +106,36 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Payment Logic
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Payment Successful'),
-                    content: Text('Thank you for your purchase!'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('Close'),
-                      ),
-                    ],
-                  ),
-                );
+                if (_selectedPaymentMethod == "Payment via UPI") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PhonePePayment(), //
+                    ),
+                  );
+                } else {
+                  // Show success dialog for Payment on Delivery
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Payment will be required on delivery'),
+                      content: Text('Thank you for your purchase!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Close'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade600,
               ),
               child: Text(
                   'Proceed to Pay',
-                style: TextStyle(color: Colors.white)
+                  style: TextStyle(color: Colors.white)
               ),
             ),
           ],
