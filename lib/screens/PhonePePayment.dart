@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 
@@ -23,6 +22,8 @@ class _PhonePePaymentState extends State<PhonePePayment> {
   String body = "";
   String apiEndPoint = "/pg/v1/pay";
   Object? result;
+  bool isOrderConfirmed = false;
+  bool payViaUPI = false;
 
   // Function to generate checksum and return the base64 encoded body
   String generateChecksum() {
@@ -57,23 +58,9 @@ class _PhonePePaymentState extends State<PhonePePayment> {
       home: Scaffold(
         appBar: AppBar(
           title: Text("ShopLocalia"),
+          backgroundColor: Colors.green,
         ),
-        body: Column(
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Set button color to green
-                foregroundColor: Colors.white, // Set text color to white
-              ),
-              onPressed: () {
-                startPgTransaction();
-              },
-              child: Text("Start Transaction"),
-            ),
-            const SizedBox(height: 20),
-            Text("Result \n $result"),
-          ],
-        ),
+        body:  buildConfirmationScreen() ,
       ),
     );
   }
@@ -88,6 +75,40 @@ class _PhonePePaymentState extends State<PhonePePayment> {
     }).catchError((error) {
       handleError(error);
     });
+  }
+
+  // Build the confirmation screen
+  Widget buildConfirmationScreen() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 100),
+            const SizedBox(height: 20),
+            Text("Your Order was placed successfully",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Text("• Your Order will arrive in 15-20 min", style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // Set button color to green
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+              ),
+              onPressed: () {
+                startPgTransaction();
+              },
+              child: Text(
+                "Proceed to Pay",
+                style: TextStyle(fontSize: 18,color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   // Function to start the PhonePe transaction

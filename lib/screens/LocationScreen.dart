@@ -7,7 +7,11 @@ class LocationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Online Local Shopping'),
+        title: const Text('Online Local Shopping',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: Colors.green.shade600,
         centerTitle: true,
         elevation: 4.0,

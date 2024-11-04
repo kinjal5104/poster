@@ -51,7 +51,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order’s Summary - Cart'),
+        title: Text('Order’s Summary - Cart',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: Colors.green.shade600,
       ),
       body: Column(

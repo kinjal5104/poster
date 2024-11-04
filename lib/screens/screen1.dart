@@ -5,7 +5,14 @@ class Screen1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("ONLINE LOCAL SHOPPING"),
+        title: Text("ONLINE LOCAL SHOPPING",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
+
         backgroundColor: Colors.green,
         actions: [
           IconButton(
